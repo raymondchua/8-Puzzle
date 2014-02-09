@@ -1,20 +1,34 @@
-import java.util.Queue();
+/*
+ *  Compilation:  javac Board.java
+ *
+ *  
+ */
+
+import java.util.*;
 
 public class Board {
 
-	int[][] board;
+	private final int N;
+	private final int[][] board;
 
 	// construct a board from an N-by-N array of tiles
    	public Board(int[][] tiles){
 
-   		board = tiles;
+   		N = tiles.length;
+   		board = new int[N][N];
+
+   		for (int x = 0; x < N; x++){
+   			for (int y = 0; y < N; y++){
+   				board[x][y] = tiles[x][y];
+   			}
+   		}
+
+
 
    	}        
 
    	// return number of blocks out of place
    	public int hamming(){
-
-   		int N = board[0].length;
 
 
    		//get the total number of tiles in the board
@@ -26,7 +40,7 @@ public class Board {
    		int numOfHammingBlocks = 0;
 
    		//transfer the content in the board to a 1D array
-   		int[] boardArray = get1DArray();
+   		int[] boardArray = get1DArray(board);
 
 
    		//check if blocks are out of place. Set true if it is out of place. Ignoring empty space, which is 0.
@@ -45,7 +59,7 @@ public class Board {
    	// return sum of Manhattan distances between blocks and goal
    	public int manhattan(){
 
-   		int N = board[0].length;
+   
 
    		int manhattanDist = 0;
 
@@ -75,10 +89,10 @@ public class Board {
    	// does this board position equal y
    	public boolean equals(Object y){
 
-   		Board newBoard = Board(y);
+   		Board newBoard = (Board)y;
 
-   		int [] boardArray = get1DArray(board);
-   		int [] goalArray = get1DArray(newBoard);
+   		int[] boardArray = get1DArray(board);
+   		int[] goalArray = get1DArray(newBoard.getBoardValue());
 
    		boolean same = true;
 
@@ -93,10 +107,11 @@ public class Board {
 
    	}    
 
+   	
    	// return an Iterable of all neighboring board positions
    	public Iterable<Board> neighbors(){
 
-   		Queue<Board> neighbors = new Queue<Board>();
+   		Queue<Board> neighborsBoard = new LinkedList<Board>();
    		Board temp;
 
    		int N = board[0].length;
@@ -116,13 +131,19 @@ public class Board {
    			}
    		}
 
+   		
+
    		//create a tempBoard to hold the resulting board after movement
 
-   		tempBoard = new Board[N][N];
+   		int[][] tempTiles = new int[N][N];
+
+   		Board tempBoard = new Board(tempTiles);
+
+   		int[][] tempBoardData = tempBoard.getBoardValue();
 
    		for (int x = 0; x < N; x++){
    			for(int y = 0; y < N; y++){
-   				tempBoard[x][y] = board[x][y];
+   				tempBoardData[x][y] = board[x][y];
    			}
    		}
 
@@ -145,14 +166,14 @@ public class Board {
    				*/
 
    				if( i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[empty-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
 
    				}
 
@@ -164,14 +185,14 @@ public class Board {
 
    				else if ( i == 1){
 
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
 
    				}
 
@@ -183,14 +204,14 @@ public class Board {
 
    				else if ( i == 2){
 
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
 
    				}
 
@@ -202,14 +223,14 @@ public class Board {
 
    				else if ( i == 3){
 
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
 
    				}
 
@@ -218,6 +239,8 @@ public class Board {
 
    			}
    		}
+
+   	
 
    		/* empty tile on the top left corner
    		* 0 | 1 | 2
@@ -236,14 +259,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on bottom
@@ -253,18 +276,20 @@ public class Board {
    				*/
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
 
    		}
+
+   	
 
    		/* empty tile on the top right corner
    		* 1 | 2 | 0
@@ -285,14 +310,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on bottom
@@ -302,18 +327,20 @@ public class Board {
    				*/
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
 
    		}
+
+   	
 
    		/* empty tile on the bottom left corner
    		* 1 | 2 | 3
@@ -333,14 +360,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on right
@@ -350,18 +377,20 @@ public class Board {
    				*/
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
 
    		}
+
+   	
 
    		/* empty tile on the bottom right corner
    		* 1 | 2 | 3
@@ -381,15 +410,16 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
+
 
    				/*swap with tile on left
    				* 1 | 2 | 3
@@ -398,18 +428,19 @@ public class Board {
    				*/
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
 
    		}
+
 
    		/* empty tile on the top center
    		* 1 | 0 | 3
@@ -429,14 +460,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on right
@@ -446,14 +477,14 @@ public class Board {
    				*/
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on bottom
@@ -463,17 +494,19 @@ public class Board {
    				*/
 
    				else if (i == 2) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
    		}
+
+
 
    		/* empty tile on the left center
    		* 1 | 2 | 3
@@ -493,14 +526,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on right
@@ -508,17 +541,17 @@ public class Board {
    				* 4 | 0 | 5
    				* 6 | 7 | 8
    				*/
-   				*/
+   				
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on bottom
@@ -528,17 +561,18 @@ public class Board {
    				*/
 
    				else if (i == 2) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
    		}
+
 
    		/* empty tile on the bottom center
    		* 1 | 2 | 3
@@ -558,14 +592,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on right
@@ -573,17 +607,17 @@ public class Board {
    				* 7 | 4 | 5
    				* 6 | 8 | 0
    				*/
-   				*/
+   				
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY+1];
-   					tempBoard[emptyX][emptyY+1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY+1];
+   					tempBoardData[emptyX][emptyY+1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY+1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY+1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on left
@@ -593,17 +627,19 @@ public class Board {
    				*/
 
    				else if (i == 2) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
    		}
+
+   	
 
    		/* empty tile on the center right
    		* 1 | 2 | 3
@@ -623,14 +659,14 @@ public class Board {
    				*/
 
    				if (i == 0){
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX-1][emptyY];
-   					tempBoard[emptyX-1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX-1][emptyY];
+   					tempBoardData[emptyX-1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX-1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX-1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on bottom
@@ -638,17 +674,17 @@ public class Board {
    				* 7 | 4 | 8
    				* 6 | 5 | 0
    				*/
-   				*/
+   				
 
    				else if (i == 1) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX+1][emptyY];
-   					tempBoard[emptyX+1][emptyY] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX+1][emptyY];
+   					tempBoardData[emptyX+1][emptyY] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX+1][emptyY] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX+1][emptyY] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
 
    				/*swap with tile on left
@@ -658,57 +694,67 @@ public class Board {
    				*/
 
    				else if (i == 2) {
-   					tempBoard[emptyX][emptyY] = tempBoard[emptyX][emptyY-1];
-   					tempBoard[emptyX][emptyY-1] = 0;
-   					temp = new Board(tempBoard);
-   					neighbors.enqueue(temp);
+   					tempBoardData[emptyX][emptyY] = tempBoardData[emptyX][emptyY-1];
+   					tempBoardData[emptyX][emptyY-1] = 0;
+   					temp = new Board(tempBoardData);
+   					neighborsBoard.add(temp);
 
    					//undo the tile movement
-   					tempBoard[emptyX][emptyY-1] = tempBoard[emptyX][emptyY];
-   					tempBoard[emptyX][emptyY] = 0;
+   					tempBoardData[emptyX][emptyY-1] = tempBoardData[emptyX][emptyY];
+   					tempBoardData[emptyX][emptyY] = 0;
    				}
    			}
    		}
 
 
-   	return neighbors;
+   	return neighborsBoard;
 
 
 
-   	} 
+   	}
+
+
 
    	// return a string representation of the board
    	public String toString(){
 
    		String content1D = "1D Array: [ ";
    		String content2D = "";
-   		int numOfColumn = board[0].length;
+   		int numOfColumn = N;
 
    		for (int i = 0; i < numOfColumn; i++){
    			for (int j = 0; j < numOfColumn; j++){
-   				content2D += board[i][j] + " ";
+   				
+   				//if tile is 0, print empty space
+   				if (board[i][j] == 0){
+   					content2D +="  ";
+   				}
+
+   				else{
+   					content2D += board[i][j] + " ";	
+   				}
+   				
    			}
 
-   			content2D += "/n";
+   			content2D += "\n";
    		}
 
    		for (int i = 0; i < numOfColumn; i++){
    			for (int j = 0; j < numOfColumn; j++){
-   				content1D += board[i][j] + ", "
+   				content1D += board[i][j] + ", ";
    			}
    		}
 
    		content1D += "]";
 
    		return content2D + content1D;
+  
 
    	}
 
    	//transfer the content in the board to a 1D array
-   	private int[] get1DArray(Board input){
+   	private int[] get1DArray(int[][] input){
 
-   		//let N be the dimension value
-   		int N = input[0].length;
 
    		//get the total number of tiles in the board
    		int boardSize = N * N;
@@ -728,7 +774,63 @@ public class Board {
    		return boardArray;
 
 
-   	}           
+   	}
+
+   	public int[][] getBoardValue(){
+   		return board;
+   	}
+
+   	public Board getTwin(){
+
+   		int[][] temp = new int[N][N];
+
+   		//copy board values to a new int[][]
+   		for(int x = 0; x < N; x++){
+   			System.arraycopy(this.board[x],0,temp[x],0,N);
+   		}
+
+   		boolean doNotUseRowOne = false;
+
+   		//check if first row has any tile with 0 value
+   		for(int i = 0; i < N; i++){
+   			if(temp[0][i] == 0){
+   				doNotUseRowOne = true;
+   			}
+   		}
+
+   		if(doNotUseRowOne){
+   			int tempVal = temp[1][0];
+   			temp[1][0] = temp[1][1];
+   			temp[1][1] = tempVal;
+   		}
+
+   		else{
+   			int tempVal = temp[0][0];
+   			temp[0][0] = temp[0][1];
+   			temp[0][1] = tempVal;
+   		}
+
+
+   		return new Board(temp);
+
+
+   	}    
+
+
+   	public boolean isGoal(){
+
+   		int[] temp = get1DArray(board);
+
+   		for(int i = 0; i < N*N; i++){
+   			if (temp[i] != i){
+   				return false;
+   			}
+   		}
+
+   		return true;
+
+
+   	}       
 
 
 }
